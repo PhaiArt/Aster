@@ -1,0 +1,83 @@
+/* ===== 设计令牌 · 灰白极简（浅色为默认） ===== */
+:root{
+  color-scheme: light;
+
+  --bg:#FFFFFF;
+  --bg-soft:#F8F8F9;
+  --card:#F4F4F5;
+  --card-2:#EEEEF0;
+  --text:#29292C;
+  --text-2:#99999F;
+  --text-3:#B3B3B8;
+  --border:#EBEBED;
+  --accent:#DDE3EA;
+  --white:#FFFFFF;
+
+  --dark:#2A2A2E;               /* 主操作色 */
+  --dark-fg:#FFFFFF;            /* 主操作色上的文字 */
+
+  --bubble-me:#E9EAEE;          /* 自己的气泡 */
+  --bubble-me-fg:#29292C;
+  --bubble-other:#F5F5F7;       /* 对方气泡 */
+  --bubble-other-fg:#29292C;
+  --bubble-radius:16px;         /* 气泡圆角（外观设置会覆盖） */
+  --bubble-corner:6px;          /* 靠头像那一角的圆角 */
+
+  /* 表面 / 浮层 */
+  --surface:#FFFFFF;            /* 弹窗、菜单、白卡 */
+  --surface-2:#FBFBFC;
+  --head-bg:rgba(255,255,255,.92);
+  --head-bg-strong:rgba(255,255,255,.96);
+  --nav-bg:rgba(255,255,255,.94);
+  --overlay-bg:rgba(30,30,34,.34);
+  --quote-bg:rgba(255,255,255,.6);
+  --quote-line:#C9CDD4;
+  --toast-bg:rgba(42,42,46,.92);
+  --toast-fg:#FFFFFF;
+  --danger:#B45757;
+  --danger-bg:#F7E9E9;
+  --avatar-1:#D9DEE6;
+  --avatar-2:#EFF1F4;
+  --page-outside:#F0F0F2;
+  --chev:#C9C9CF;
+  --nav-idle:#C4C4CA;
+  --scrollbar:#D9D9DE;
+
+  --radius-card:22px;
+  --radius-bubble:16px;
+  --radius-sheet:26px;
+  --radius-input:999px;
+
+  --nav-h:62px;
+  --head-h:54px;
+
+  --font:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+
+  --shadow-1:0 1px 3px rgba(35,35,40,.05);
+  --shadow-2:0 10px 30px rgba(35,35,40,.10);
+  --shadow-pill:0 1px 4px rgba(35,35,40,.08);
+
+  --dur:.18s;
+  --kb:0px;                      /* 键盘高度（JS 动态写入） */
+
+  /* 聊天排版（聊天设置可改） */
+  --chat-font:15px;
+  --bubble-gap:18px;
+  --bubble-pad-x:17px;
+  --bubble-pad-y:13px;
+  --chat-avatar:34px;
+
+  /* ---------- Life 页 ---------- */
+  --life-card:#FFFFFF;
+  --life-music-bg:#E7F0F6;
+  --life-music-ink:#25333D;
+  --life-music-sub:#6D7F8B;
+  --life-music-line:rgba(37,51,61,.13);
+  --life-orange:#F39A3C; --life-orange2:#E8892A;
+  --life-blue:#3B9EDB; --life-blue2:#2F8CC6;
+  --rose:#CE6A78; --rose-soft:#F7E3E6;
+  --blue-soft:#E6F0F7;
+  --green:#6E9979; --green-soft:#E7F1EA;
+  --amber:#D39448; --amber-soft:#F7EBD9;
+  --accent-soft:#F1F3F6;
+}

@@ -1,0 +1,153 @@
+﻿/* ===== 深色主题：只覆盖必要的表面与装饰，组件颜色尽量走变量 ===== */
+html[data-theme="dark"]{
+  color-scheme: dark;
+
+  --bg:#101012;
+  --bg-soft:#17171A;
+  --card:#1E1E22;
+  --card-2:#26262B;
+  --text:#F1F1F3;
+  --text-2:#9B9BA3;
+  --text-3:#6F6F78;
+  --border:#2A2A30;
+  --accent:#2A2A30;
+  --white:#FFFFFF;
+
+  --dark:#F1F1F3;
+  --dark-fg:#141416;
+
+  --bubble-other:#222227;
+  --bubble-other-fg:#EFEFF2;
+
+  --surface:#1A1A1E;
+  --surface-2:#1D1D21;
+  --head-bg:rgba(16,16,18,.86);
+  --head-bg-strong:rgba(16,16,18,.94);
+  --nav-bg:rgba(16,16,18,.90);
+  --overlay-bg:rgba(0,0,0,.58);
+  --quote-bg:rgba(255,255,255,.07);
+  --quote-line:#3A3A42;
+  --toast-bg:rgba(242,242,244,.96);
+  --toast-fg:#141416;
+  --danger:#D98A8A;
+  --danger-bg:#3A2424;
+  --avatar-1:#2A2A30;
+  --avatar-2:#1E1E22;
+  --page-outside:#0A0A0C;
+  --chev:#5A5A63;
+  --nav-idle:#5F5F68;
+  --scrollbar:#3A3A42;
+
+  --shadow-1:0 1px 3px rgba(0,0,0,.45);
+  --shadow-2:0 10px 30px rgba(0,0,0,.55);
+  --shadow-pill:0 1px 4px rgba(0,0,0,.50);
+}
+
+html[data-theme="dark"] body{background:var(--bg)}
+@media(min-width:480px){ html[data-theme="dark"] body{background:var(--page-outside)} }
+html[data-theme="dark"] .app{box-shadow:none}
+html[data-theme="dark"] .app-head{background:var(--head-bg)}
+html[data-theme="dark"] .bottom-nav{background:var(--nav-bg);border-top-color:var(--border)}
+html[data-theme="dark"] .bottom-nav .nav-item{color:var(--nav-idle)}
+html[data-theme="dark"] .switch::after{background:#E9E9ED}
+html[data-theme="dark"] .switch.on::after{background:#141416}
+html[data-theme="dark"] .seg.light .sg.active{background:#2E2E34;color:var(--text);box-shadow:none}
+html[data-theme="dark"] .pillbar .pp.active{background:#2E2E34;color:var(--text);box-shadow:none}
+html[data-theme="dark"] .icon-btn:active{background:var(--card)}
+
+html[data-theme="dark"] .overlay{background:var(--overlay-bg)}
+html[data-theme="dark"] .toast{background:var(--toast-bg);color:var(--toast-fg)}
+html[data-theme="dark"] .fab{background:var(--surface);color:var(--text)}
+html[data-theme="dark"] .set-card .set-ico{background:var(--surface);box-shadow:none}
+
+html[data-theme="dark"] .list-row + .list-row,
+html[data-theme="dark"] .chat-item + .chat-item{border-top-color:rgba(255,255,255,.06)}
+html[data-theme="dark"] .pinned-wrap .list-card{background:var(--card)}
+
+html[data-theme="dark"] .chat-head{background:var(--head-bg-strong)}
+html[data-theme="dark"] .chat-inputbar{background:var(--head-bg-strong);border-top-color:var(--border)}
+html[data-theme="dark"] .chat-toolbar{border-top-color:var(--border);color:var(--text-2)}
+html[data-theme="dark"] .chat-sec-head .fold{color:var(--chev)}
+html[data-theme="dark"] .me-top .mi-handle .mh-edit{color:var(--text-3)}
+html[data-theme="dark"] .me-menu .mm-row .chev{color:var(--chev)}
+html[data-theme="dark"] .post-card .pc-more{color:var(--text-3)}
+html[data-theme="dark"] .post-card .pc-acts{color:var(--text-2)}
+html[data-theme="dark"] .me-cover-preview .cp-tag{background:rgba(26,26,30,.85);color:var(--text-2)}
+
+/* 封面类装饰：浅色渐变在深色下会刺眼，换成暗色 */
+html[data-theme="dark"] .moments-cover{
+  background:
+    repeating-linear-gradient(90deg,rgba(255,255,255,.035) 0 5px,rgba(255,255,255,0) 5px 24px),
+    linear-gradient(180deg,#1E222A 0%,#16181D 70%,#101114 100%);
+}
+html[data-theme="dark"] .moments-cover .mc-title{color:#B4BAC4}
+html[data-theme="dark"] .mc-av-wrap .avatar{border-color:var(--surface)}
+html[data-theme="dark"] .me-cover-preview{
+  background:
+    repeating-linear-gradient(90deg,rgba(255,255,255,.035) 0 5px,rgba(255,255,255,0) 5px 24px),
+    linear-gradient(180deg,#1E222A,#16181D);
+}
+html[data-theme="dark"] .pf-cover{
+  background:
+    repeating-linear-gradient(90deg,rgba(255,255,255,.035) 0 5px,rgba(255,255,255,0) 5px 24px),
+    linear-gradient(180deg,#1E222A,#16181D);
+}
+html[data-theme="dark"] .cs-cover{
+  background:
+    var(--cover-img,none) center/cover no-repeat,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='160'%3E%3Cg fill='%23ffffff' fill-opacity='.16'%3E%3Cpath d='M40 30l2 5 5 2-5 2-2 5-2-5-5-2 5-2z'/%3E%3Cpath d='M140 60l1.5 3.8 4 1.6-4 1.6-1.5 3.8-1.5-3.8-4-1.6 4-1.6z'/%3E%3Ccircle cx='90' cy='100' r='1.4'/%3E%3Ccircle cx='30' cy='120' r='1.2'/%3E%3Ccircle cx='170' cy='20' r='1.3'/%3E%3C/g%3E%3C/svg%3E"),
+    linear-gradient(160deg,#272C34 0%,#1B1E24 55%,#16181C 100%);
+  background-size:cover,200px,auto;
+}
+html[data-theme="dark"] .cs-cover .cs-quote{color:#A9B0BA}
+html[data-theme="dark"] .cs-av-wrap .avatar{border-color:var(--surface)}
+
+/* 背景图案在深色下换成浅色星点/网格 */
+html[data-theme="dark"] .chat-body.bg-stars,
+html[data-theme="dark"] .bg-preview.p-stars,
+html[data-theme="dark"] .bg-choices .bgc.p-stars{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='230' height='230'%3E%3Cg fill='%23ffffff' fill-opacity='.07'%3E%3Cpath d='M30 40l2.2 5.4L38 48l-5.8 2.6L30 56l-2.2-5.4L22 48l5.8-2.6z'/%3E%3Cpath d='M170 24l1.6 4 4.4 2-4.4 2-1.6 4-1.6-4-4.4-2 4.4-2z'/%3E%3Ccircle cx='110' cy='90' r='1.6'/%3E%3Ccircle cx='60' cy='150' r='1.3'/%3E%3Cpath d='M200 150l2 5 5.4 2.2-5.4 2.2-2 5-2-5-5.4-2.2 5.4-2.2z'/%3E%3Ccircle cx='150' cy='190' r='1.2'/%3E%3Cpath d='M80 200l1.4 3.4 3.6 1.6-3.6 1.6-1.4 3.4-1.4-3.4-3.6-1.6 3.6-1.6z'/%3E%3Ccircle cx='205' cy='70' r='1.1'/%3E%3C/g%3E%3C/svg%3E");
+  background-size:236px;
+}
+html[data-theme="dark"] .chat-body.bg-dots,
+html[data-theme="dark"] .bg-preview.p-dots,
+html[data-theme="dark"] .bg-choices .bgc.p-dots{
+  background-image:radial-gradient(rgba(255,255,255,.07) 1.2px,transparent 1.2px);
+  background-size:16px 16px;
+}
+html[data-theme="dark"] .chat-body.bg-grid,
+html[data-theme="dark"] .bg-preview.p-grid,
+html[data-theme="dark"] .bg-choices .bgc.p-grid{
+  background-image:linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px);
+  background-size:26px 26px;
+}
+html[data-theme="dark"] .bg-preview.p-custom,
+html[data-theme="dark"] .bg-choices .bgc.p-custom{background-color:var(--surface)}
+
+/* 模拟通话窗口在深色下的表面 */
+html[data-theme="dark"] .call-win{background:linear-gradient(170deg,#1D1D22,#141417)}
+html[data-theme="dark"] .call-btn{background:var(--surface);color:var(--text)}
+html[data-theme="dark"] .call-btn.hangup{background:#8E5A5A;color:#fff}
+html[data-theme="dark"] .call-ball{background:rgba(242,242,244,.95);color:#141416}
+html[data-theme="dark"] .call-ball .cb-end{background:rgba(0,0,0,.08);color:#141416}
+html[data-theme="dark"] .call-mem .avatar{box-shadow:0 0 0 2px var(--surface),0 0 0 3px rgba(255,255,255,.08)}
+
+html[data-theme="dark"] .role-cover{
+  background:
+    repeating-linear-gradient(90deg,rgba(255,255,255,.035) 0 5px,rgba(255,255,255,0) 5px 24px),
+    linear-gradient(180deg,#1E222A,#16181D);
+}
+html[data-theme="dark"] .role-cover .rc-quote{color:#A9B0BA}
+
+html[data-theme="dark"]{
+  --life-card:#26262C;
+  --life-music-bg:#242C34;
+  --life-music-ink:#F1F5F8;
+  --life-music-sub:#A6B3BC;
+  --life-music-line:rgba(255,255,255,.10);
+  --rose:#E58B96; --rose-soft:#3D292D;
+  --blue-soft:#25323B;
+  --green:#92BE9B; --green-soft:#25342A;
+  --amber:#E5B274; --amber-soft:#3B3022;
+  --accent-soft:#292D34;
+}

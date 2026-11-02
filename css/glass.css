@@ -1,0 +1,185 @@
+/* ===== Aster 壁纸 + 毛玻璃主题 ===== */
+
+/* 壁纸层：固定在 430px 应用宽度内，内容浮在壁纸上方 */
+.app-wall{
+  position:fixed;top:0;bottom:0;left:50%;transform:translateX(-50%);
+  width:100%;max-width:430px;z-index:0;opacity:0;pointer-events:none;
+  overflow:hidden;background-size:cover;
+  background-position:calc(50% + var(--wall-x,0px)) calc(50% + var(--wall-y,0px));
+  transform:translateX(-50%) scale(var(--wall-zoom,1));
+  transform-origin:center center;
+  transition:opacity .35s ease;
+}
+body.wall-on .app-wall{opacity:var(--wall-opacity,1)}
+body.wall-on .app,body.theme-glass .app{background:transparent}
+body.wall-on #screen,body.theme-glass #screen{position:relative;z-index:1;background:transparent}
+body.wall-on .chat-page,body.theme-glass .chat-page,
+body.wall-on .life-page,body.theme-glass .life-page{background:transparent!important}
+
+/* 壁纸预设：低饱和、亮色，保证玻璃上的文字对比 */
+.app-wall.wall-dawn{
+  background:
+    radial-gradient(circle at 28% 14%,rgba(255,233,201,.95) 0,transparent 22%),
+    linear-gradient(165deg,#D6E1E2 0%,#ADC0C2 38%,#7C979D 67%,#526B73 100%);
+}
+.app-wall.wall-cream{
+  background:
+    radial-gradient(circle at 76% 16%,rgba(255,247,226,.95) 0,transparent 24%),
+    linear-gradient(160deg,#F1E7D8 0%,#E3D1B9 45%,#CBB092 100%);
+}
+.app-wall.wall-mist{
+  background:
+    radial-gradient(circle at 20% 18%,rgba(232,243,247,.9) 0,transparent 24%),
+    linear-gradient(160deg,#DCE7EB 0%,#C2D2D8 45%,#93AAB4 100%);
+}
+.app-wall.wall-dawn:before,.app-wall.wall-cream:before,.app-wall.wall-mist:before{
+  content:"";position:absolute;left:-20%;bottom:6%;width:140%;height:52%;
+  border-radius:50% 50% 0 0;background:rgba(55,75,82,.20);transform:rotate(-4deg);
+}
+.app-wall.wall-dawn:after,.app-wall.wall-cream:after,.app-wall.wall-mist:after{
+  content:"";position:absolute;left:-20%;bottom:-16%;width:140%;height:48%;
+  border-radius:50% 50% 0 0;background:rgba(35,55,62,.22);transform:rotate(5deg);
+}
+.app-wall.wall-cream:before{background:rgba(125,98,72,.14)}
+.app-wall.wall-cream:after{background:rgba(98,73,52,.16)}
+.app-wall.wall-mist:before{background:rgba(72,96,108,.16)}
+.app-wall.wall-mist:after{background:rgba(58,80,92,.18)}
+.app-wall.wall-local{background-image:var(--wall-img);background-color:#CAD7DB}
+.app-wall.wall-local:before{display:none}
+.app-wall.wall-local:after{
+  content:"";position:absolute;inset:0;border-radius:0;
+  background:rgba(0,0,0,.12);transform:none;display:block;
+}
+
+/* 玻璃变量 */
+body.theme-glass{
+  --glass-blur:22px;
+  --glass-bg:rgba(255,255,255,.52);
+  --glass-bg-soft:rgba(255,255,255,.36);
+  --glass-bg-strong:rgba(255,255,255,.64);
+  --glass-line:rgba(255,255,255,.68);
+  --card:var(--glass-bg);
+  --card-2:rgba(255,255,255,.64);
+  --bg-soft:var(--glass-bg-soft);
+  --surface:var(--glass-bg-strong);
+  --life-card:var(--glass-bg);
+  --head-bg:rgba(255,255,255,.54);
+  --nav-bg:rgba(255,255,255,.58);
+  --border:var(--glass-line);
+  --bubble-other:rgba(255,255,255,.60);
+  --quote-bg:rgba(255,255,255,.40);
+  --text-2:#5F656C;
+  --text-3:#727981;
+}
+body.glass-soft{
+  --glass-blur:16px;--glass-bg:rgba(255,255,255,.42);--glass-bg-soft:rgba(255,255,255,.28);
+  --glass-bg-strong:rgba(255,255,255,.54);--head-bg:rgba(255,255,255,.44);--nav-bg:rgba(255,255,255,.48);
+}
+body.glass-strong{
+  --glass-blur:28px;--glass-bg:rgba(255,255,255,.64);--glass-bg-soft:rgba(255,255,255,.48);
+  --glass-bg-strong:rgba(255,255,255,.74);--head-bg:rgba(255,255,255,.64);--nav-bg:rgba(255,255,255,.68);
+}
+
+/* 主要玻璃表面 */
+body.theme-glass :where(
+  .app-head,.bottom-nav,.chat-head,.chat-inputbar,.chat-toolbar,
+  .set-card,.list-card,.post-card,.chat-item,.chat-sec-head,
+  .life-tile,.ld-card,.ld-list,.pomo-card,.period-hero,.period-log,
+  .period-logs,.period-settings,.music-track,.music-together,
+  .stat-card,.rc-group,.share-card,.call-card,.cs-head,.cs-tabs
+){
+  backdrop-filter:blur(var(--glass-blur)) saturate(1.3);
+  -webkit-backdrop-filter:blur(var(--glass-blur)) saturate(1.3);
+}
+body.theme-glass .app-head{background:var(--head-bg);border-bottom:1px solid var(--glass-line)}
+body.theme-glass .bottom-nav{background:var(--nav-bg);border-top-color:var(--glass-line)}
+body.theme-glass .bottom-nav .nav-item{color:var(--text-3)}
+body.theme-glass .bottom-nav .nav-item.active{color:var(--text)}
+body.theme-glass .chat-head{background:var(--glass-bg);border-bottom:1px solid var(--glass-line)}
+body.theme-glass .chat-inputbar,body.theme-glass .chat-toolbar{background:var(--glass-bg);border-top-color:var(--glass-line)}
+body.theme-glass .chat-body,body.theme-glass .chat-body.bg-plain,
+body.theme-glass .chat-body.bg-stars,body.theme-glass .chat-body.bg-dots,
+body.theme-glass .chat-body.bg-grid{background:transparent!important;background-image:none!important}
+body.theme-glass .msg-row .bubble{
+  backdrop-filter:blur(calc(var(--glass-blur) * .7)) saturate(1.3);
+  -webkit-backdrop-filter:blur(calc(var(--glass-blur) * .7)) saturate(1.3);
+  border:1px solid rgba(255,255,255,.35);
+  box-shadow:0 6px 18px rgba(30,40,45,.08);
+}
+body.theme-glass .msg-row .bubble.share-bubble,
+body.theme-glass .msg-row .bubble.call-bubble{
+  border:0;box-shadow:none;background:transparent;
+  backdrop-filter:none;-webkit-backdrop-filter:none;
+}
+/* 动态卡本身不再做 backdrop blur：部分浏览器会把矩形模糊边界画到圆角卡片外，形成方框 */
+body.theme-glass .share-card,
+body.theme-glass .call-card{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+body.theme-glass .day-chip,body.theme-glass .sys-tip{background-color:transparent}
+
+/* 弹层也跟随玻璃 */
+body.theme-glass .overlay .modal,body.theme-glass .sheet{
+  background:var(--glass-bg-strong);
+  backdrop-filter:blur(calc(var(--glass-blur) + 8px)) saturate(1.3);
+  -webkit-backdrop-filter:blur(calc(var(--glass-blur) + 8px)) saturate(1.3);
+  border:1px solid var(--glass-line);
+}
+body.theme-glass .chat-inputbar textarea{background:rgba(255,255,255,.26)}
+
+/* 深色玻璃 */
+html[data-theme="dark"] body.theme-glass{
+  --glass-bg:rgba(28,28,34,.62);
+  --glass-bg-soft:rgba(28,28,34,.42);
+  --glass-bg-strong:rgba(30,30,36,.76);
+  --glass-line:rgba(255,255,255,.16);
+  --card:var(--glass-bg);
+  --card-2:rgba(42,42,50,.72);
+  --bg-soft:var(--glass-bg-soft);
+  --surface:var(--glass-bg-strong);
+  --life-card:var(--glass-bg);
+  --head-bg:rgba(24,24,28,.72);
+  --nav-bg:rgba(24,24,28,.76);
+  --border:var(--glass-line);
+  --bubble-other:rgba(43,43,51,.72);
+  --quote-bg:rgba(255,255,255,.08);
+  --text-2:#C9CDD2;
+  --text-3:#A5ABB2;
+}
+html[data-theme="dark"] body.glass-soft{--glass-bg:rgba(28,28,34,.50);--head-bg:rgba(24,24,28,.60);--nav-bg:rgba(24,24,28,.64)}
+html[data-theme="dark"] body.glass-strong{--glass-bg:rgba(30,30,36,.76);--head-bg:rgba(24,24,28,.82);--nav-bg:rgba(24,24,28,.86)}
+html[data-theme="dark"] body.theme-glass .msg-row .bubble{border-color:rgba(255,255,255,.12);box-shadow:0 6px 18px rgba(0,0,0,.20)}
+
+body.theme-glass .me-menu{background:var(--glass-bg);border:1px solid var(--glass-line);border-radius:18px;margin:8px 14px 12px;padding:4px 12px;backdrop-filter:blur(var(--glass-blur)) saturate(1.3);-webkit-backdrop-filter:blur(var(--glass-blur)) saturate(1.3)}
+body.theme-glass .me-menu .mm-row{border-bottom-color:var(--glass-line)}
+
+/* 专属卡片也纳入玻璃：音乐小组件、音乐页、经期卡、顶部弹窗、音乐悬浮窗 */
+body.theme-glass .top-toast,
+body.theme-glass .music-dock{
+  background:var(--glass-bg-strong);
+  border:1px solid var(--glass-line);
+  backdrop-filter:blur(calc(var(--glass-blur) + 6px)) saturate(1.3);
+  -webkit-backdrop-filter:blur(calc(var(--glass-blur) + 6px)) saturate(1.3);
+}
+body.theme-glass .life-music{
+  background:
+    radial-gradient(circle at 86% 6%,rgba(255,255,255,.45) 0,transparent 42%),
+    var(--glass-bg);
+  border:1px solid var(--glass-line);
+  color:var(--text);
+  backdrop-filter:blur(var(--glass-blur)) saturate(1.3);
+  -webkit-backdrop-filter:blur(var(--glass-blur)) saturate(1.3);
+}
+body.theme-glass .life-music-label,body.theme-glass .life-m-sub{color:var(--text-3)}
+body.theme-glass .life-music-wave i{background:var(--text-2)}
+body.theme-glass .life-m-controls{color:var(--text)}
+body.theme-glass .life-music .play{background:var(--text);color:var(--bg)}
+body.theme-glass .music-together,
+body.theme-glass .period-next,
+body.theme-glass .period-cal{
+  background:var(--glass-bg);
+  border-color:var(--glass-line);
+  backdrop-filter:blur(var(--glass-blur)) saturate(1.3);
+  -webkit-backdrop-filter:blur(var(--glass-blur)) saturate(1.3);
+}
+body.theme-glass .music-list{background:var(--glass-bg);border-color:var(--glass-line)}
+body.theme-glass .music-track.active{background:rgba(255,255,255,.24)}
+html[data-theme="dark"] body.theme-glass .music-track.active{background:rgba(255,255,255,.10)}

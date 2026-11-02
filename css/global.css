@@ -1,0 +1,113 @@
+﻿/* ===== 全局 · 重置 / App 壳 / 底部导航 ===== */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{
+  font-family:var(--font);
+  color:var(--text);
+  background:var(--bg);
+  font-size:15px;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+  overscroll-behavior-y:none;
+}
+img{display:block;max-width:100%}
+button{font-family:inherit;border:0;background:none;color:inherit;cursor:pointer}
+input,textarea,select{font-family:inherit;font-size:inherit;color:inherit;border:0;outline:none;background:none}
+a{color:inherit;text-decoration:none}
+ul,ol{list-style:none}
+::selection{background:var(--accent)}
+
+/* 桌面端：限制手机宽度居中，如一台干净的设备 */
+.app{
+  position:relative;
+  margin:0 auto;
+  max-width:430px;
+  min-height:100dvh;
+  background:var(--bg);
+}
+@media(min-width:480px){
+  body{background:var(--page-outside)}
+  .app{
+    box-shadow:0 0 0 1px var(--border),0 18px 60px rgba(35,35,40,.08);
+    min-height:100dvh;
+  }
+  ::-webkit-scrollbar{width:6px;height:6px}
+  ::-webkit-scrollbar-thumb{background:var(--scrollbar);border-radius:99px}
+  ::-webkit-scrollbar-track{background:transparent}
+}
+
+/* 通用工具 */
+.row{display:flex;align-items:center}
+.grow{flex:1;min-width:0}
+.muted{color:var(--text-2)}
+.tiny{font-size:11px;color:var(--text-3)}
+.tap{transition:transform var(--dur),opacity var(--dur),background var(--dur)}
+.tap:active{transform:scale(.97);opacity:.85}
+.no-motion *,.no-motion *::before,.no-motion *::after{animation:none!important;transition:none!important}
+body[data-font="lg"]{font-size:16.5px}
+
+/* ===== 顶部栏 ===== */
+.app-head{
+  position:sticky;top:0;z-index:40;
+  height:calc(var(--head-h) + env(safe-area-inset-top,0px));
+  display:flex;align-items:center;
+  padding:env(safe-area-inset-top,0px) 14px 0;
+  background:var(--head-bg);
+  backdrop-filter:blur(14px);
+}
+.app-head .head-title{
+  position:absolute;left:50%;transform:translateX(-50%);
+  font-size:17px;font-weight:600;letter-spacing:.4px;
+  max-width:60%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.head-side{display:flex;align-items:center;gap:6px;min-width:64px}
+.head-side.right{justify-content:flex-end}
+.icon-btn{
+  width:36px;height:36px;border-radius:50%;
+  display:inline-flex;align-items:center;justify-content:center;
+  color:var(--text);transition:background var(--dur),transform var(--dur);
+}
+.icon-btn:active{background:var(--card);transform:scale(.92)}
+.icon-btn.sm{width:30px;height:30px}
+.icon-btn.ghost{color:var(--text-2)}
+
+/* ===== 底部导航 ===== */
+.bottom-nav{
+  position:fixed;bottom:0;left:50%;transform:translateX(-50%);
+  width:100%;max-width:430px;
+  height:calc(var(--nav-h) + env(safe-area-inset-bottom,0px));
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  background:var(--nav-bg);
+  backdrop-filter:blur(16px);
+  border-top:1px solid var(--border);
+  display:flex;z-index:50;
+}
+.bottom-nav .nav-item{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+  color:var(--nav-idle);font-size:10.5px;letter-spacing:.2px;
+  transition:color var(--dur);
+}
+.bottom-nav .nav-item.active{color:var(--text)}
+.bottom-nav .nav-item:active{transform:scale(.94)}
+.page-with-nav{padding-bottom:calc(var(--nav-h) + 24px + env(safe-area-inset-bottom,0px))}
+
+/* ===== 区块小标题（大写字距） ===== */
+.sec-label{
+  font-size:10.5px;letter-spacing:2.2px;color:var(--text-3);
+  text-transform:uppercase;font-weight:600;
+}
+
+/* 空状态 */
+.empty{
+  text-align:center;color:var(--text-3);font-size:13px;
+  padding:44px 20px;letter-spacing:.5px;
+}
+.empty .empty-ico{font-size:30px;opacity:.5;margin-bottom:8px}
+
+/* 轻量出场动画 */
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.anim-in{animation:fadeUp .22s ease both}
+
+/* 聊天页锁定页面滚动（内部滚动） */
+html.no-scroll,body.no-scroll{overflow:hidden;height:100dvh}

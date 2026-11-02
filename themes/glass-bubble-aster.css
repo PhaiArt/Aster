@@ -1,0 +1,31 @@
+/* ============================================================
+   毛玻璃 · 气泡主题（Aster 适配版）
+   用法：应用外观 → 气泡自定义 CSS → 粘贴本文件全部内容
+   说明：原数值全部保留（.3 白底 / 999px / 4px 10px / 13px /
+   blur(24px) / 小圆点），只替换选择器。
+   ============================================================ */
+
+.msg-row .bubble:not(.share-bubble):not(.call-bubble):not(.stk-bubble):not(.ck-bubble):not(.bubble-muted),
+.ap-bubble {
+  background: rgba(255,255,255,.3) !important;
+  color: #444444 !important;
+  border: 0 !important;
+  border-radius: 999px !important;
+  padding: 4px 10px !important;
+  font-size: 13px !important;
+  line-height: 1.3 !important;
+  word-break: break-all !important;
+  backdrop-filter: blur(24px) !important;
+  -webkit-backdrop-filter: blur(24px) !important;
+  box-shadow: 0 1px 6px rgba(0,0,0,.03) !important;
+}
+
+/* 左右两侧的实心圆点（图片/语音/卡片不强行加点） */
+.msg-row .bubble:not(.share-bubble):not(.call-bubble):not(.stk-bubble):not(.ck-bubble):not(.bubble-muted):not(:has(img)):not(:has(.voice-bubble))::before,
+.ap-bubble::before {
+  content: " • " !important;
+  font-size: 14px !important;
+  margin-right: 4px !important;
+  color: #999999 !important;
+  vertical-align: middle !important;
+}

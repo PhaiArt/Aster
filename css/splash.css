@@ -1,0 +1,70 @@
+﻿/* ===== 开屏动画 · 星尘汇聚（aster） ===== */
+.splash{
+  position:fixed;top:0;bottom:0;left:0;right:0;max-width:430px;margin:0 auto;z-index:120;background:var(--bg);
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;cursor:pointer;
+  transition:opacity .32s ease;
+  -webkit-tap-highlight-color:transparent;
+}
+.splash.out{opacity:0;pointer-events:none}
+.splash-stage{display:flex;flex-direction:column;align-items:center;margin-top:-18px}
+
+.splash-mark{position:relative;width:120px;height:120px;display:flex;align-items:center;justify-content:center}
+.splash-particles{position:absolute;left:50%;top:50%;width:0;height:0}
+.splash-particles i{
+  position:absolute;left:0;top:0;width:var(--sz,3px);height:var(--sz,3px);border-radius:50%;
+  background:var(--text-3);opacity:0;margin:calc(var(--sz,3px) / -2) 0 0 calc(var(--sz,3px) / -2);
+  animation:spGather calc(900ms * var(--sp,1)) cubic-bezier(.22,.8,.25,1) var(--dl,0ms) both;
+}
+@keyframes spGather{
+  0%   {transform:translate(var(--dx),var(--dy)) scale(1);opacity:0}
+  18%  {opacity:.6}
+  72%  {opacity:.5}
+  100% {transform:translate(0,0) scale(.25);opacity:0}
+}
+
+.splash-star{
+  font-size:64px;line-height:1;color:var(--text);opacity:0;
+  animation:spStar calc(720ms * var(--sp,1)) 600ms cubic-bezier(.2,1.25,.4,1) both;
+  will-change:transform,opacity;
+}
+@keyframes spStar{
+  0%  {opacity:0;transform:scale(.42) rotate(-14deg)}
+  62% {opacity:1;transform:scale(1.07) rotate(3deg)}
+  100%{opacity:1;transform:scale(1) rotate(0)}
+}
+.splash-ring{
+  position:absolute;width:84px;height:84px;border-radius:50%;
+  border:1px solid var(--border);opacity:0;
+  animation:spRing calc(760ms * var(--sp,1)) 800ms ease-out both;
+}
+@keyframes spRing{
+  0%  {transform:scale(.55);opacity:.75}
+  100%{transform:scale(2.05);opacity:0}
+}
+
+.splash-word{
+  margin-top:4px;font-size:16px;font-weight:600;letter-spacing:4px;padding-left:4px;
+  color:var(--text);opacity:0;
+  animation:spRise calc(560ms * var(--sp,1)) 1000ms ease both;
+}
+.splash-tag{
+  margin-top:10px;font-size:10.5px;letter-spacing:1.6px;color:var(--text-3);opacity:0;
+  animation:spRise calc(560ms * var(--sp,1)) 1180ms ease both;
+}
+@keyframes spRise{
+  0%  {opacity:0;transform:translateY(7px)}
+  100%{opacity:1;transform:none}
+}
+
+/* 减少动画：直接呈现结果，快速淡出 */
+.splash.splash-static .splash-particles,
+.splash.splash-static .splash-ring{display:none}
+.splash.splash-static .splash-star,
+.splash.splash-static .splash-word,
+.splash.splash-static .splash-tag{animation:none;opacity:1;transform:none}
+
+@media (prefers-reduced-motion: reduce){
+  .splash-particles,.splash-ring{display:none}
+  .splash-star,.splash-word,.splash-tag{animation:none;opacity:1;transform:none}
+}

@@ -1,0 +1,76 @@
+/* ============================================================
+   【糯叽机】仿 IG（粉） · 气泡主题（Aster 适配版）
+   用法：应用外观 → 气泡自定义 CSS → 粘贴本文件全部内容
+   说明：
+   1. 只提取 IG 主题的气泡颜色、渐变和圆角，不搬头像/引用条/转账卡；
+   2. Aster 用 .cont 表示连发，配合 :has() 还原 is-first / mid / last / single；
+   3. 分享、通话、报备、图片表情、已读不回、图片消息保留 Aster 原样式。
+   ============================================================ */
+
+/* 普通文字气泡：不是图片/贴纸/报备/分享/通话/已读不回 */
+.msg-row .bubble:not(.share-bubble):not(.call-bubble):not(.stk-bubble):not(.ck-bubble):not(.bubble-muted):not(:has(img)),
+.ap-bubble {
+  color: #262626 !important;
+}
+
+/* ---------- 对方气泡 ---------- */
+.msg-row:not(.mine) .bubble:not(.share-bubble):not(.call-bubble):not(.stk-bubble):not(.ck-bubble):not(.bubble-muted):not(:has(img)),
+.ap-row.them .ap-bubble {
+  background: #F2F5F6 !important;
+  color: #262626 !important;
+  border: 1px solid rgba(0,0,0,.02) !important;
+}
+
+/* 对方：单条 */
+.msg-row:not(.mine):not(.cont):not(:has(+ .msg-row:not(.mine).cont)) .bubble:not(.share-bubble):not(.call-bubble):not(.stk-bubble):not(.ck-bubble):not(.bubble-muted):not(:has(img)),
+.ap-row.them .ap-bubble {
+  border-radius: 22px !important;
+}
+
+/* 对方：第一条 */
+.msg-row:not(.mine):not(.cont):has(+ .msg-row:not(.mine).cont) .bubble:not(.share-bubble):not(.call-bubble):not(.stk-bubble):not(.ck-bubble):not(.bubble-muted):not(:has(img)) {
+  border-radius: 22px 22px 22px 10px !important;
+}
+
+/* 对方：中间 */
+.msg-row:not(.mine).cont:has(+ .msg-row:not(.mine).cont) .bubble:not(.share-bubble):not(.call-bubble):not(.stk-bubble):not(.ck-bubble):not(.bubble-muted):not(:has(img)) {
+  border-radius: 10px 22px 22px 10px !important;
+}
+
+/* 对方：最后一条 */
+.msg-row:not(.mine).cont:not(:has(+ .msg-row:not(.mine).cont)) .bubble:not(.share-bubble):not(.call-bubble):not(.stk-bubble):not(.ck-bubble):not(.bubble-muted):not(:has(img)) {
+  border-radius: 10px 22px 22px 22px !important;
+}
+
+/* ---------- 我方气泡 ---------- */
+.msg-row.mine .bubble:not(.share-bubble):not(.call-bubble):not(.stk-bubble):not(.ck-bubble):not(.bubble-muted):not(:has(img)),
+.ap-row.me .ap-bubble {
+  color: #262626 !important;
+  border: 0 !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,.02) !important;
+}
+
+/* 我方：单条 */
+.msg-row.mine:not(.cont):not(:has(+ .msg-row.mine.cont)) .bubble:not(.share-bubble):not(.call-bubble):not(.stk-bubble):not(.ck-bubble):not(.bubble-muted):not(:has(img)),
+.ap-row.me .ap-bubble {
+  border-radius: 22px !important;
+  background: linear-gradient(135deg, #F2F5F6 0%, #FDE7F4 100%) !important;
+}
+
+/* 我方：第一条 */
+.msg-row.mine:not(.cont):has(+ .msg-row.mine.cont) .bubble:not(.share-bubble):not(.call-bubble):not(.stk-bubble):not(.ck-bubble):not(.bubble-muted):not(:has(img)) {
+  border-radius: 22px 22px 10px 22px !important;
+  background: #F2F5F6 !important;
+}
+
+/* 我方：中间 */
+.msg-row.mine.cont:has(+ .msg-row.mine.cont) .bubble:not(.share-bubble):not(.call-bubble):not(.stk-bubble):not(.ck-bubble):not(.bubble-muted):not(:has(img)) {
+  border-radius: 22px 10px 10px 22px !important;
+  background: linear-gradient(180deg, #F2F5F6 0%, #F8EFEA 50%, #FDE7F4 100%) !important;
+}
+
+/* 我方：最后一条 */
+.msg-row.mine.cont:not(:has(+ .msg-row.mine.cont)) .bubble:not(.share-bubble):not(.call-bubble):not(.stk-bubble):not(.ck-bubble):not(.bubble-muted):not(:has(img)) {
+  border-radius: 22px 10px 22px 22px !important;
+  background: #FDE7F4 !important;
+}
