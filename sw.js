@@ -1,6 +1,6 @@
 /* Aster · 离线应用外壳
    策略：导航与静态资源优先走网络，失败时回退缓存；保证在线拿最新代码，离线仍能打开。 */
-const CACHE='aster-shell-v3';
+const CACHE='aster-shell-v4';
 const ASSETS=[
   './',
   './index.html',

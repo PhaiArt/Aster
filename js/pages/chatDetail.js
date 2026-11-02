@@ -14,7 +14,7 @@ Pages.chatDetail=function(el,convId){
   const vars='--chat-avatar:'+cs.avatarSize+'px;';
 
   el.innerHTML=
-    '<div class="chat-page'+(dissolved?' dissolved':'')+'" data-conv="'+U.esc(cv.id)+'">'
+    '<div class="chat-page bg-'+cs.bg+(dissolved?' dissolved':'')+'" data-conv="'+U.esc(cv.id)+'">'
     +'<div class="chat-head">'
     +'<button class="icon-btn" id="cd-back">'+I.chevronLeft(22)+'</button>'
     +'<span id="cd-av" role="button" style="display:inline-flex">'+(cv.isGroup?Pages.groupAvatarHTML(cv,38):UI.avatar(cv.contactId,38))+'</span>'

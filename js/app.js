@@ -116,10 +116,32 @@ window.App=(function(){
   }
   function applyTheme(){
     const t=resolvedTheme();
-    document.documentElement.dataset.theme=t;
-    document.documentElement.style.colorScheme=t;
-    const meta=document.querySelector('meta[name="theme-color"]');
-    if(meta) meta.setAttribute('content',t==='dark'?'#101012':'#FFFFFF');
+    const root=document.documentElement;
+    const prev=root.dataset.theme;
+    root.dataset.theme=t;
+    root.style.colorScheme=t;
+    const color=t==='dark'?'#101012':'#FFFFFF';
+    /* iOS Safari 对 setAttribute 的 theme-color 有时不立即刷新状态栏，
+       替换 meta 节点能触发重新读取；同时同步根背景，避免刘海区域闪白。 */
+    const old=document.querySelector('meta[name="theme-color"]');
+    if(old){
+      if(old.getAttribute('content')!==color){
+        const meta=old.cloneNode(false);
+        meta.setAttribute('content',color);
+        old.replaceWith(meta);
+      }
+    }else{
+      const meta=document.createElement('meta');
+      meta.name='theme-color';
+      meta.setAttribute('content',color);
+      document.head.appendChild(meta);
+    }
+    root.style.backgroundColor=color;
+    /* iOS 有时会缓存带 backdrop-filter 的顶栏图层，切主题后要强制重绘一次 */
+    if(prev!==t){
+      root.classList.add('theme-repaint');
+      requestAnimationFrame(()=>requestAnimationFrame(()=>root.classList.remove('theme-repaint')));
+    }
   }
   function applyBubble(){
     const app=Store.state.app||{};

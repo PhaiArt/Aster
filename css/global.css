@@ -1,4 +1,4 @@
-﻿/* ===== 全局 · 重置 / App 壳 / 底部导航 ===== */
+/* ===== 全局 · 重置 / App 壳 / 底部导航 ===== */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%}
 body{
@@ -111,3 +111,29 @@ body[data-font="lg"]{font-size:16.5px}
 
 /* 聊天页锁定页面滚动（内部滚动） */
 html.no-scroll,body.no-scroll{overflow:hidden;height:100dvh}
+
+/* 轻动效：只使用 transform / opacity，避免滚动时掉帧 */
+html{touch-action:manipulation;-webkit-text-size-adjust:100%}
+/* 主题切换时强制重绘带模糊的顶栏 / 底栏，避免 iOS 缓存旧颜色 */
+html.theme-repaint .app-head,
+html.theme-repaint .bottom-nav,
+html.theme-repaint .chat-head,
+html.theme-repaint .chat-toolbar,
+html.theme-repaint .chat-inputbar{
+  backdrop-filter:none!important;
+  -webkit-backdrop-filter:none!important;
+}
+input[type="range"]{touch-action:none}
+:where(.chat-item,.post-card,.life-tile,.list-row,.set-card,.set-row,.rc-group){transition:transform .16s ease,opacity .16s ease}
+:where(.chat-item,.post-card,.life-tile,.list-row,.set-card,.set-row,.rc-group):active{transform:scale(.992)}
+.bottom-nav .nav-item{transition:color .18s ease,transform .14s ease}
+.bottom-nav .nav-item>svg{transition:transform .18s ease}
+.bottom-nav .nav-item.active>svg{transform:translateY(-1px) scale(1.05)}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
+}
+/* iOS Safari：输入框低于 16px 时，聚焦会自动放大页面 */
+@supports (-webkit-touch-callout:none){
+  input:not([type="range"]):not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+  textarea,select{font-size:16px!important}
+}

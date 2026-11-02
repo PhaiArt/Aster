@@ -5,6 +5,9 @@ Pages.cards=function(el){
   const st=Store.state;
   let tab='universal';   // universal | exclusive | report | dynamic
   let roleId=null;
+  let batch=false;
+  const selected=new Set();
+  const folded={};
 
   const TAB_NAME={universal:'通用', exclusive:'专属', report:'报备', dynamic:'动态'};
 
@@ -12,6 +15,55 @@ Pages.cards=function(el){
     el.innerHTML=buildHtml();
     UI.mountBlobs(el);
     bind();
+  }
+
+  function labelOf(kind){ return ({universal:'通用',exclusive:'专属',dynamic:'动态'})[kind]||''; }
+  function cardsOf(kind){
+    if(kind==='exclusive') return Store.getExclusiveCards(roleId);
+    if(kind==='dynamic') return Store.getDynamicCards();
+    return Store.getUniversalCards();
+  }
+  function deleteCard(kind,id){
+    if(kind==='exclusive') Store.delExclusiveCard(roleId,id);
+    else if(kind==='dynamic') Store.delDynamicCard(id);
+    else Store.delUniversalCard(id);
+  }
+  function groupedBody(cards,kind){
+    const groups=Store.getCardGroups();
+    const row=c=>{
+      const sel=selected.has(c.id);
+      return '<div class="list-row card-row'+(batch?' batch':'')+(sel?' sel':'')+'" data-card="'+c.id+'">'
+        +(batch?'<span class="card-check'+(sel?' on':'')+'"></span>':'')
+        +'<span class="grow" style="font-size:14px;line-height:1.5;white-space:normal">'+U.esc(c.content)+'</span>'
+        +(c.usage?'<span class="tiny" style="margin:0 8px;flex-shrink:0">'+c.usage+'次</span>':'')
+        +(batch?'':'<button class="icon-btn sm" data-del="'+c.id+'" style="color:#B45757;flex-shrink:0" title="删除">'+I.trash(15)+'</button>')
+        +'</div>';
+    };
+    const section=(gid,name)=>{
+      const list=gid==='__none'?cards.filter(c=>!c.groupId||!groups.some(g=>g.id===c.groupId)):cards.filter(c=>c.groupId===gid);
+      const key=kind+':'+gid;
+      const isFolded=!!folded[key];
+      return '<div class="card-group-head sec-label">'
+        +'<button class="card-fold'+(isFolded?' folded':'')+'" data-fold="'+key+'" title="'+(isFolded?'展开':'收起')+'">'+I.chevronDown(14)+'</button>'
+        +'<span class="card-group-ico">'+I.folder(14)+'</span>'
+        +'<span class="grow card-group-name">'+U.esc(name)+'</span>'
+        +'<span class="tiny">'+list.length+'</span>'
+        +'<button class="icon-btn sm" data-addgroup="'+(gid==='__none'?'':gid)+'" title="在这个分组添加">'+I.plus(15)+'</button>'
+        +'</div>'
+        +(isFolded?'':'<div class="list-card">'+(list.length?list.map(row).join(''):'<div class="tiny" style="padding:10px 14px;opacity:.55">暂无字卡，点 + 添加</div>')+'</div>');
+    };
+    let html='<div style="padding:0 16px 20px">';
+    if(kind==='dynamic') html+='<p class="tiny" style="margin:2px 2px 10px;line-height:1.6">动态字卡：角色每天会按概率发 0–2 条动态，每条从这些字卡里抽 1–6 张拼成一条文案。</p>';
+    if(batch) html+='<div class="card-batchbar"><span>已选 <b>'+selected.size+'</b></span><button data-bmove>移动到分组</button><button data-bdel>删除</button><button data-bcancel>取消</button></div>';
+    if(!cards.length&&!groups.length){
+      html+='<div class="empty"><div class="empty-ico">✦</div>'+({universal:'暂无通用字卡',exclusive:'该角色暂无专属字卡',dynamic:'暂无动态字卡'})[kind]+'<br>点上方 + 添加，或先建分组</div>';
+    }else{
+      groups.forEach(g=>{ html+=section(g.id,g.name); });
+      html+=section('__none','未分组');
+    }
+    html+='<button class="btn light" data-gmgr style="width:100%;margin-top:14px">管理分组</button>';
+    html+='</div>';
+    return html;
   }
 
   function buildHtml(){
@@ -24,6 +76,7 @@ Pages.cards=function(el){
       +[['universal','通用'],['exclusive','专属'],['report','报备'],['dynamic','动态']].map(t=>
         '<button class="pp '+(tab===t[0]?'active':'')+'" data-tab="'+t[0]+'">'+t[1]+'</button>').join('')
       +'<button class="pp icon-only" data-add title="添加字卡">'+I.plus(17)+'</button>'
+      +'<button class="pp icon-only'+(batch?' active':'')+'" data-batch title="批量管理">'+I.check(17)+'</button>'
       +'</div></div>';
 
     /* 专属字卡：横向角色选择器 */
@@ -48,43 +101,7 @@ Pages.cards=function(el){
     else if(tab==='dynamic') cards=Store.getDynamicCards();
     else cards=Store.getReportCards();
 
-    if(!cards.length){
-      const tips={universal:'暂无通用字卡', exclusive:'该角色暂无专属字卡', report:'暂无报备字卡', dynamic:'暂无动态字卡'};
-      html+='<div class="empty"><div class="empty-ico">✦</div>'+tips[tab]+'<br>点上方 + 添加</div>';
-    }else if(tab==='dynamic'){
-      html+='<div style="padding:0 16px 20px">'
-        +'<p class="tiny" style="margin:2px 2px 10px;line-height:1.6">动态字卡：角色每天会按概率发 0–2 条动态，每条从这些字卡里抽 1–6 张拼成一条文案。</p>'
-        +'<div class="list-card">'+cards.map(c=>
-          '<div class="list-row">'
-          +'<span class="grow" style="font-size:14px;line-height:1.5;white-space:normal">'+U.esc(c.content)+'</span>'
-          +(c.usage?'<span class="tiny" style="margin:0 8px;flex-shrink:0">'+c.usage+'次</span>':'')
-          +'<button class="icon-btn sm" data-del="'+c.id+'" style="color:#B45757;flex-shrink:0" title="删除">'+I.trash(15)+'</button>'
-          +'</div>').join('')+'</div></div>';
-    }else if(tab==='universal'){
-      /* 通用字卡：按分组分区展示（空分组也展示，未分组殿后），点击卡片移入分组 */
-      const groups=Store.getCardGroups();
-      const row=c=>'<div class="list-row" data-card="'+c.id+'" style="cursor:pointer">'
-        +'<span class="grow" style="font-size:14px;line-height:1.5;white-space:normal">'+U.esc(c.content)+'</span>'
-        +(c.usage?'<span class="tiny" style="margin:0 8px;flex-shrink:0">'+c.usage+'次</span>':'')
-        +'<button class="icon-btn sm" data-del="'+c.id+'" style="color:#B45757;flex-shrink:0" title="删除">'+I.trash(15)+'</button>'
-        +'</div>';
-      html+='<div style="padding:0 16px 20px">';
-      groups.forEach(g=>{
-        const list=cards.filter(c=>c.groupId===g.id);
-        html+='<div class="sec-label" style="display:flex;align-items:center;gap:6px;margin:10px 2px 6px">'
-          +'<span style="flex-shrink:0">'+I.folder(14)+'</span>'+U.esc(g.name)
-          +'<span class="tiny">'+list.length+'</span></div>'
-          +'<div class="list-card">'+(list.length?list.map(row).join('')
-            :'<div class="tiny" style="padding:10px 14px;opacity:.55">点击卡片可移入</div>')+'</div>';
-      });
-      const rest=cards.filter(c=>!c.groupId||!groups.some(g=>g.id===c.groupId));
-      html+='<div class="sec-label" style="display:flex;align-items:center;gap:6px;margin:12px 2px 6px">未分组'
-        +'<span class="tiny">'+rest.length+'</span></div>'
-        +'<div class="list-card">'+(rest.length?rest.map(row).join('')
-          :'<div class="tiny" style="padding:10px 14px;opacity:.55">点击卡片可移入</div>')+'</div>'
-        +'<button class="btn light" data-gmgr style="width:100%;margin-top:14px">管理分组</button>';
-      html+='</div>';
-    }else{
+    if(tab==='report'){
       /* 报备字卡：一组 = 多句文字 + 多张图；发送时随机一句 + 50% 概率一张图 */
       html+='<div style="padding:0 16px 20px;display:flex;flex-direction:column;gap:12px">';
       if(!cards.length){
@@ -111,6 +128,8 @@ Pages.cards=function(el){
           +'</div>';
       });
       html+='</div>';
+    }else{
+      html+=groupedBody(cards,tab);
     }
     return html;
   }
@@ -123,46 +142,92 @@ Pages.cards=function(el){
     if(addBtn) addBtn.onclick=openAdd;
 
     U.$$('[data-tab]',el).forEach(b=>{
-      b.onclick=()=>{ tab=b.dataset.tab; refresh(); };
+      b.onclick=()=>{ tab=b.dataset.tab; batch=false; selected.clear(); refresh(); };
     });
 
     U.$$('[data-role]',el).forEach(b=>{
-      b.onclick=()=>{ roleId=b.dataset.role; refresh(); };
+      b.onclick=()=>{ roleId=b.dataset.role; batch=false; selected.clear(); refresh(); };
     });
+
+    const batchBtn=U.$('[data-batch]',el);
+    if(batchBtn) batchBtn.onclick=()=>{
+      if(tab==='report'){ UI.toast('报备字卡暂不支持批量操作'); return; }
+      batch=!batch; selected.clear(); refresh();
+    };
 
     U.$$('[data-del]',el).forEach(b=>{
       b.onclick=async e=>{
         e.stopPropagation();
         if(!await UI.confirm('删除这张字卡？',{title:'删除字卡',ok:'删除',danger:true})) return;
         const id=b.dataset.del;
-        if(tab==='universal') Store.delUniversalCard(id);
-        else if(tab==='exclusive') Store.delExclusiveCard(roleId,id);
-        else if(tab==='dynamic') Store.delDynamicCard(id);
-        else Store.delReportCard(id);
+        deleteCard(tab,id);
         refresh();
         UI.toast('已删除');
       };
     });
 
-    /* 通用字卡：点击卡片行 → 移入分组菜单（仅行体，删除按钮已 stopPropagation） */
-    if(tab==='universal'){
+    U.$$('[data-fold]',el).forEach(b=>{
+      b.onclick=e=>{
+        e.stopPropagation();
+        const key=b.dataset.fold;
+        folded[key]=!folded[key];
+        refresh();
+      };
+    });
+    U.$$('[data-addgroup]',el).forEach(b=>{
+      b.onclick=()=>openAdd(b.dataset.addgroup||null);
+    });
+
+    /* 通用 / 专属 / 动态：点击卡片行 → 移动分组；批量模式点行 → 选中 */
+    if(tab!=='report'){
       U.$$('[data-card]',el).forEach(row=>{
         row.onclick=e=>{
-          if(e.target.closest('[data-del]')) return;
+          if(e.target.closest('[data-del],[data-addgroup]')) return;
           const cid=row.dataset.card;
-          const c=Store.getUniversalCards().find(x=>x.id===cid);
+          if(batch){
+            if(selected.has(cid)) selected.delete(cid); else selected.add(cid);
+            refresh();
+            return;
+          }
+          const c=cardsOf(tab).find(x=>x.id===cid);
           if(!c) return;
           const items=[{icon:'x',label:'未分组'+(c.groupId?'':' ✓'),onClick:()=>{
-            Store.setCardGroup(cid,null); refresh(); UI.toast('已移至未分组');
+            Store.setCardGroupIn(tab,roleId,cid,null); refresh(); UI.toast('已移至未分组');
           }}];
           Store.getCardGroups().forEach(g=>{
             items.push({icon:'folder',label:g.name+(c.groupId===g.id?' ✓':''),onClick:()=>{
-              Store.setCardGroup(cid,g.id); refresh(); UI.toast('已移入「'+g.name+'」');
+              Store.setCardGroupIn(tab,roleId,cid,g.id); refresh(); UI.toast('已移入「'+g.name+'」');
             }});
           });
           UI.menuAt(items,row);
         };
       });
+
+      const bMove=U.$('[data-bmove]',el);
+      if(bMove) bMove.onclick=()=>{
+        if(!selected.size){ UI.toast('先选择字卡'); return; }
+        const ids=[...selected];
+        const items=[{icon:'x',label:'未分组',onClick:()=>{
+          ids.forEach(id=>Store.setCardGroupIn(tab,roleId,id,null));
+          batch=false; selected.clear(); refresh(); UI.toast('已移动到未分组');
+        }}];
+        Store.getCardGroups().forEach(g=>{
+          items.push({icon:'folder',label:g.name,onClick:()=>{
+            ids.forEach(id=>Store.setCardGroupIn(tab,roleId,id,g.id));
+            batch=false; selected.clear(); refresh(); UI.toast('已移入「'+g.name+'」');
+          }});
+        });
+        UI.menuAt(items,bMove);
+      };
+      const bDel=U.$('[data-bdel]',el);
+      if(bDel) bDel.onclick=async()=>{
+        if(!selected.size){ UI.toast('先选择字卡'); return; }
+        if(!await UI.confirm('删除选中的 '+selected.size+' 张字卡？',{title:'批量删除',ok:'删除',danger:true})) return;
+        [...selected].forEach(id=>deleteCard(tab,id));
+        batch=false; selected.clear(); refresh(); UI.toast('已删除');
+      };
+      const bCancel=U.$('[data-bcancel]',el);
+      if(bCancel) bCancel.onclick=()=>{ batch=false; selected.clear(); refresh(); };
     }
 
     const gmBtn=U.$('[data-gmgr]',el);
@@ -291,7 +356,7 @@ Pages.cards=function(el){
     return m;
   }
 
-  function openAdd(){
+  function openAdd(groupId){
     if(tab==='exclusive' && !roleId){ UI.toast('请先选择角色'); return; }
     if(tab==='report'){
       UI.openModal({
@@ -314,9 +379,11 @@ Pages.cards=function(el){
       });
       return;
     }
+    const g=groupId&&Store.getCardGroups().find(x=>x.id===groupId);
     UI.openModal({
       title:'添加'+TAB_NAME[tab]+'字卡',
-      html:'<p class="tiny" style="margin-bottom:8px">每行一条，可一次输入多条</p>'
+      html:(g?'<p class="tiny" style="margin-bottom:8px">添加到分组「'+U.esc(g.name)+'」</p>':'')
+        +'<p class="tiny" style="margin-bottom:8px">每行一条，可一次输入多条</p>'
         +'<textarea class="field" id="card-new" style="min-height:140px;resize:vertical" placeholder="第一行&#10;第二行&#10;第三行"></textarea>'
         +'<div class="modal-actions">'
         +'<button class="btn light" data-a="c">取消</button>'
@@ -328,9 +395,9 @@ Pages.cards=function(el){
           if(!text){ UI.toast('内容不能为空'); return; }
           const lines=text.split('\n').map(l=>l.trim()).filter(Boolean);
           lines.forEach(line=>{
-            if(tab==='universal') Store.addUniversalCard(line);
-            else if(tab==='exclusive') Store.addExclusiveCard(roleId,line);
-            else if(tab==='dynamic') Store.addDynamicCard(line);
+            if(tab==='universal') Store.addUniversalCard(line,groupId||null);
+            else if(tab==='exclusive') Store.addExclusiveCard(roleId,line,groupId||null);
+            else if(tab==='dynamic') Store.addDynamicCard(line,groupId||null);
             else Store.addReportCard(line);
           });
           api.close();

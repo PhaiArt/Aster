@@ -64,6 +64,7 @@ window.Pages=window.Pages||{};
       const box=U.$('#post-list',el);
       box.innerHTML= posts.length?posts.map(postCard).join('')
         :'<div class="empty"><div class="empty-ico">☾</div>还没有动态<br>点右下角 + 发布第一条吧</div>';
+      UI.mountBlobs(box);
       bindPosts(box);
     }
 

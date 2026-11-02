@@ -11,7 +11,7 @@ Object.defineProperty(Pages,'GROUP_DEFS',{
   get(){
     try{
       const gs=Store.state.chatGroups;
-      if(Array.isArray(gs)&&gs.length) return gs.map(g=>[g.id,g.name,g.icon||'📁']);
+      if(Array.isArray(gs)&&gs.length) return gs.map(g=>[g.id,g.name,g.icon||'']);
     }catch(e){}
     return FALLBACK_GROUPS;
   }
@@ -131,10 +131,10 @@ Pages.openCreateGroup=function(){
 /* 分组设置弹窗（Chats 页 Add 菜单入口）：重命名 / 删除聊天分组，至少保留一个 */
 Pages.openChatGroupSettings=function(){
   function bodyHtml(){
-    return '<p class="tiny" style="margin-bottom:10px">修改名称后点 ✓ 保存；删除分组时组内会话移入其余分组。</p>'
+    return '<p class="tiny" style="margin-bottom:10px">图标可以清空、改成单个星星 / 爱心等符号；修改后点 ✓ 保存。删除分组时组内会话移入其余分组。</p>'
       +Pages.GROUP_DEFS.map(g=>
-        '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">'
-        +'<span style="font-size:18px;flex-shrink:0;width:26px;text-align:center">'+g[2]+'</span>'
+        '<div style="display:flex;align-items:center;gap:7px;margin-bottom:8px">'
+        +'<input class="field grp-icon-input" data-icon="'+g[0]+'" value="'+U.esc(g[2]||'')+'" maxlength="4" placeholder="无">'
         +'<input class="field grow" data-name="'+g[0]+'" value="'+U.esc(g[1])+'" maxlength="16">'
         +'<button class="icon-btn sm" data-save="'+g[0]+'" title="保存">'+I.check(16)+'</button>'
         +'<button class="icon-btn sm" data-del="'+g[0]+'" style="color:#B45757" title="删除分组">'+I.trash(15)+'</button>'
@@ -144,8 +144,9 @@ Pages.openChatGroupSettings=function(){
     U.$$('[data-save]',scope).forEach(b=>b.onclick=()=>{
       const id=b.dataset.save;
       const inp=U.$('[data-name="'+id+'"]',scope);
+      const icon=U.$('[data-icon="'+id+'"]',scope);
       if(!inp.value.trim()){ UI.toast('分组名不能为空'); return; }
-      if(Store.renameChatGroup(id,inp.value)) UI.toast('已保存');
+      if(Store.updateChatGroup(id,{name:inp.value,icon:icon?icon.value:''})) UI.toast('已保存');
     });
     U.$$('[data-del]',scope).forEach(b=>b.onclick=async()=>{
       const id=b.dataset.del;
@@ -248,7 +249,7 @@ Pages.chats=function(el){
   function sectionHead(key,icon,label){
     const folded=st.ui.folded[key];
     return '<button class="chat-sec-head" data-fold="'+key+'">'
-      +'<span class="sec-ico">'+icon+'</span>'+U.esc(label)
+      +(icon?'<span class="sec-ico">'+icon+'</span>':'')+U.esc(label)
       +'<span class="fold '+(folded?'folded':'')+'">'+I.chevronUp(15)+'</span></button>';
   }
 
@@ -297,6 +298,7 @@ Pages.chats=function(el){
         :'<div class="empty"><div class="empty-ico">⭐</div>还没有群聊<br>点上方「+Add → 新增群聊」创建</div>';
     }
     box.innerHTML=html;
+    UI.mountBlobs(box);
 
     U.$$('[data-conv]',box).forEach(b=>b.onclick=()=>{ location.hash='#/chat/'+b.dataset.conv; });
     U.$$('[data-fold]',box).forEach(b=>b.onclick=()=>{

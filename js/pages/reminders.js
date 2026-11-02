@@ -58,6 +58,7 @@ Pages.reminders=function(el){
         ?'<button class="btn dark block" id="notif-test">发送测试通知</button>'
         :'<button class="btn dark block" id="notif-enable" '+(notifPerm==='unsupported'?'disabled':'')+'>开启桌面通知</button>')
       +'<p class="tiny rem-notify-hint">Android Chrome：菜单 → 安装应用 / 添加到主屏幕。iOS Safari：分享 → 添加到主屏幕，必须从桌面图标打开后再开启。完全关闭 App 后仍要定时推送，需要服务端 Web Push；静态网页无法独立保活。</p>'
+      +'<p class="tiny rem-notify-hint">如果测试没有横幅：确认是从桌面图标打开的 PWA，并在系统设置里允许通知；iPhone 在 App 前台时可能不显示横幅，可锁屏后再用提醒验证。</p>'
       +'</div>';
 
     html+='<div class="cs-sec sec-label">提醒时间点</div>';
@@ -111,9 +112,9 @@ Pages.reminders=function(el){
     }
     const testNotif=U.$('#notif-test',el);
     if(testNotif){
-      testNotif.onclick=()=>{
-        const ok=Notifier.show('Aster 测试通知','桌面通知连接正常',{tag:'aster-test',url:'./#/reminders'});
-        UI.toast(ok?'已发送测试通知':'发送失败，请检查系统通知权限');
+      testNotif.onclick=async()=>{
+        const ok=await Notifier.show('Aster 测试通知','桌面通知连接正常',{tag:'aster-test-'+Date.now(),url:'./#/reminders'});
+        UI.toast(ok?'已发送测试通知':'发送失败，请检查系统通知权限和桌面安装状态');
       };
     }
 

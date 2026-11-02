@@ -18,11 +18,10 @@ window.Notifier=(function(){
       return {ok:false,permission:permission(),error:e.message};
     }
   }
-  function show(title,body,opt){
+  async function show(title,body,opt){
     opt=opt||{};
     if(!supported()||Notification.permission!=='granted') return false;
     const payload={
-      type:'notify',
       title:title||'Aster',
       body:body||'',
       tag:opt.tag||'aster-message',
@@ -30,14 +29,33 @@ window.Notifier=(function(){
       url:opt.url||(opt.convId?'./#/chat/'+opt.convId:'./')
     };
     try{
-      if(navigator.serviceWorker&&navigator.serviceWorker.controller){
-        navigator.serviceWorker.ready.then(reg=>{
-          if(reg.active) reg.active.postMessage(payload);
-        }).catch(()=>{});
-      }else{
-        new Notification(payload.title,{body:payload.body,icon:'./icons/icon-192.png',tag:payload.tag});
+      /* 不依赖 navigator.serviceWorker.controller：首次打开/刚刷新时它可能为 null，
+         但 ready 仍能拿到已激活的 SW；手机上 new Notification 往往不可用。 */
+      const reg=await navigator.serviceWorker.ready;
+      if(reg&&typeof reg.showNotification==='function'){
+        try{
+          await reg.showNotification(payload.title,{
+            body:payload.body,
+            icon:'./icons/icon-192.png',
+            badge:'./icons/icon-192.png',
+            tag:payload.tag,
+            data:{url:payload.url,convId:payload.convId}
+          });
+          return true;
+        }catch(e){
+          /* 个别 iOS 版本对页面侧 showNotification 更严格，交给 SW 再试一次 */
+          if(reg.active){
+            reg.active.postMessage({type:'notify',...payload});
+            return true;
+          }
+          return false;
+        }
       }
-      return true;
+      if(reg&&reg.active){
+        reg.active.postMessage({type:'notify',...payload});
+        return true;
+      }
+      return false;
     }catch(e){
       return false;
     }

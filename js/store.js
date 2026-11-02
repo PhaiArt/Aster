@@ -1,4 +1,4 @@
-﻿/* ===== 统一数据层：状态 + 持久化 + 动作 ===== */
+/* ===== 统一数据层：状态 + 持久化 + 动作 ===== */
 window.Store = (()=>{
   const KEY='sq_state_v1';
   const DAY=86400000;
@@ -671,9 +671,10 @@ window.Store = (()=>{
     save();
   }
   function getDynamicCards(){ return state.dynamicCards || []; }
-  function addDynamicCard(content){
+  function addDynamicCard(content,groupId){
     if(!Array.isArray(state.dynamicCards)) state.dynamicCards=[];
-    state.dynamicCards.push({id:U.uid('dc'),content,usage:0,createdAt:Date.now()});
+    const gid=(groupId&&getCardGroups().some(g=>g.id===groupId))?groupId:null;
+    state.dynamicCards.push({id:U.uid('dc'),content,usage:0,groupId:gid,createdAt:Date.now()});
     save();
   }
   function delDynamicCard(id){
@@ -685,10 +686,11 @@ window.Store = (()=>{
     const c=contact(roleId);
     return c ? (c.exclusiveCards || []) : [];
   }
-  function addExclusiveCard(roleId,content){
+  function addExclusiveCard(roleId,content,groupId){
     const c=contact(roleId); if(!c) return;
     if(!Array.isArray(c.exclusiveCards)) c.exclusiveCards=[];
-    c.exclusiveCards.push({id:U.uid('ec'), content, usage:0, createdAt:Date.now()});
+    const gid=(groupId&&getCardGroups().some(g=>g.id===groupId))?groupId:null;
+    c.exclusiveCards.push({id:U.uid('ec'), content, usage:0, groupId:gid, createdAt:Date.now()});
     save();
   }
   function delExclusiveCard(roleId,id){
@@ -753,6 +755,18 @@ window.Store = (()=>{
     g.name=name; save(); emit();
     return true;
   }
+  function updateChatGroup(id,patch){
+    const g=getChatGroups().find(x=>x.id===id);
+    if(!g) return false;
+    if(patch.name!==undefined){
+      const name=String(patch.name||'').trim();
+      if(!name) return false;
+      g.name=name;
+    }
+    if(patch.icon!==undefined) g.icon=String(patch.icon||'').slice(0,4);
+    save(); emit();
+    return true;
+  }
   function delChatGroup(id){
     const gs=getChatGroups();
     if(gs.length<=1) return false;   /* 至少保留一个分组 */
@@ -795,11 +809,19 @@ window.Store = (()=>{
     state.cardGroups=state.cardGroups.filter(g=>g.id!==id);
     if(state.cardGroups.length===before) return false;
     (state.universalCards||[]).forEach(c=>{ if(c.groupId===id) c.groupId=null; });
+    (state.dynamicCards||[]).forEach(c=>{ if(c.groupId===id) c.groupId=null; });
+    (state.contacts||[]).forEach(ct=>{ (ct.exclusiveCards||[]).forEach(c=>{ if(c.groupId===id) c.groupId=null; }); });
     save(); emit();
     return true;
   }
   function setCardGroup(cardId,groupId){
-    const c=(state.universalCards||[]).find(x=>x.id===cardId);
+    return setCardGroupIn('universal',null,cardId,groupId);
+  }
+  function setCardGroupIn(type,roleId,cardId,groupId){
+    let c=null;
+    if(type==='dynamic') c=(state.dynamicCards||[]).find(x=>x.id===cardId);
+    else if(type==='exclusive'){ const ct=contact(roleId); c=ct?(ct.exclusiveCards||[]).find(x=>x.id===cardId):null; }
+    else c=(state.universalCards||[]).find(x=>x.id===cardId);
     if(!c) return false;
     c.groupId=(groupId&&getCardGroups().some(g=>g.id===groupId))?groupId:null;
     save(); emit();
@@ -839,8 +861,8 @@ window.Store = (()=>{
     getDynamicCards, addDynamicCard, delDynamicCard,
     getExclusiveCards, addExclusiveCard, delExclusiveCard,
     getReportCards, addReportCard, addReportGroup, updateReportGroup, delReportCard, pickReport, bumpCardUsage,
-    getChatGroups, renameChatGroup, delChatGroup,
-    getCardGroups, addCardGroup, renameCardGroup, delCardGroup, setCardGroup,
+    getChatGroups, renameChatGroup, updateChatGroup, delChatGroup,
+    getCardGroups, addCardGroup, renameCardGroup, delCardGroup, setCardGroup, setCardGroupIn,
     getReplySettings, setReplySetting,
     markProactiveSent, getLastProactiveAt};
 })();
