@@ -85,7 +85,7 @@ body.theme-glass :where(
   .set-card,.list-card,.post-card,.chat-item,
   .life-tile,.ld-card,.ld-list,.pomo-card,.period-hero,.period-log,
   .period-logs,.period-settings,.music-track,.music-together,
-  .stat-card,.rc-group,.share-card,.call-card,.cs-head,.cs-tabs
+  .stat-card,.rc-group,.share-card,.music-share-card,.call-card,.cs-head,.cs-tabs
 ){
   backdrop-filter:blur(var(--glass-blur)) saturate(1.3);
   -webkit-backdrop-filter:blur(var(--glass-blur)) saturate(1.3);
@@ -114,6 +114,7 @@ body.theme-glass .msg-row .bubble.call-bubble{
 }
 /* 动态卡本身不再做 backdrop blur：部分浏览器会把矩形模糊边界画到圆角卡片外，形成方框 */
 body.theme-glass .share-card,
+body.theme-glass .music-share-card,
 body.theme-glass .call-card{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
 body.theme-glass .day-chip,body.theme-glass .sys-tip{background-color:transparent}
 

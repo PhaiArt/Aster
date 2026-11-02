@@ -337,6 +337,9 @@ body.theme-glass .chat-page .chat-inputbar{
 .ap-theme-card{display:block;padding:14px}
 .ap-theme-seg{display:flex;width:100%;margin-top:2px}
 .ap-preview{background:var(--bg-soft);border-radius:18px;padding:14px 12px;display:flex;flex-direction:column;gap:var(--bubble-gap);margin-top:2px}
+.ap-preview .ap-row{display:flex;align-items:flex-start;gap:8px}
+.ap-preview .avatar{flex-shrink:0}
+.ap-av-seg{margin-top:10px}
 .ap-row{display:flex}
 .ap-row.me{justify-content:flex-end}
 .ap-bubble{max-width:78%;padding:var(--bubble-pad-y) var(--bubble-pad-x);font-size:13px;line-height:1.62;border-radius:var(--bubble-radius);background:var(--bubble-other-custom,var(--bubble-other));color:var(--bubble-other-custom-fg,var(--bubble-other-fg));border-top-left-radius:var(--bubble-corner);transition:background .18s,color .18s,border-radius .18s,padding .18s}
@@ -360,6 +363,8 @@ html[data-theme="dark"] .ap-range::-webkit-slider-thumb{border-color:var(--bg)}
 
 /* 应用外观 · 壁纸 / 毛玻璃 */
 .ap-wall-card,.ap-glass-card{display:block;padding:12px 14px}
+.ap-avatar-card{display:block;padding:12px 14px}
+.ap-avatar-card .ap-mrow>div span{display:block;font-size:9px;color:var(--text-3);margin-top:2px;line-height:1.45}
 .ap-wall-mode{display:flex;width:100%;margin-bottom:7px}
 .ap-wall-mode .sg{flex:1;font-size:10px;justify-content:center}
 .ap-wall-pages{display:flex;gap:5px;flex-wrap:wrap;margin-top:0;margin-bottom:2px}
@@ -497,6 +502,22 @@ html[data-theme="dark"] .ap-sw i{border-color:rgba(255,255,255,.10)}
 .sh-img{margin-top:8px;border-radius:9px;overflow:hidden;height:92px}
 .sh-img img{width:100%;height:100%;object-fit:cover;display:block}
 .sh-foot{margin-top:8px;padding-top:7px;border-top:1px solid var(--border);font-size:10.5px;color:var(--text-3);letter-spacing:.5px}
+/* 分享音乐卡 */
+.msg-row .bubble.music-bubble{background:transparent;padding:0;box-shadow:none;border-radius:0;border:0}
+.music-share-card{display:flex;align-items:center;gap:10px;width:min(238px,100%);background:var(--card);border:1px solid var(--border);border-radius:14px;padding:10px;cursor:pointer;font-family:var(--font);box-sizing:border-box;color:var(--text)}
+.msc-cover{width:50px;height:50px;border-radius:12px;overflow:hidden;flex-shrink:0;background:linear-gradient(145deg,#C9B39A,#7D8D99);display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.8)}
+.msc-cover img{width:100%;height:100%;object-fit:cover;display:block}
+.msc-note{display:flex;align-items:center;justify-content:center;width:100%;height:100%}
+.msc-meta{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.msc-kicker{font-size:7px;letter-spacing:1.6px;color:var(--text-3);font-weight:600}
+.msc-meta b{font-size:12.5px;line-height:1.3;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.msc-meta span:last-child{font-size:9.5px;color:var(--text-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.msc-play{width:29px;height:29px;border-radius:50%;border:1px solid var(--border);background:var(--bg-soft);color:var(--text);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.music-share-card:active{transform:scale(.985)}
+.pc-music,.pd-music{width:100%;max-width:none;margin-top:11px;background:var(--bg-soft)}
+.music-share-preview .music-share-card{width:100%;max-width:none;margin:0;background:var(--bg-soft)}
+.pd-music{margin-top:12px}
+.music-actions{display:flex;gap:6px;flex-shrink:0}
 .call-card{display:flex;align-items:center;gap:10px;width:232px;max-width:100%;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:11px 12px}
 .cc-ico{width:34px;height:34px;border-radius:50%;background:var(--dark);color:var(--dark-fg);display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .cc-title{font-size:13px;font-weight:600}
@@ -978,6 +999,7 @@ body[data-theme="dark"] .mu-now{color:var(--life-music-ink)}
 .mt-meta span{display:block;font-size:8.5px;color:var(--text-3);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .music-track.active .mt-meta b{color:var(--rose)}
 .mt-del{width:28px;height:28px;border:0;background:none;color:var(--text-3);display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:0}
+.mt-share{width:28px;height:28px;border:0;background:none;color:var(--text-3);display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:0}
 
 @media (max-width:360px){
   .music-cover{width:196px;height:196px;border-radius:20px}

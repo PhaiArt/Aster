@@ -80,6 +80,7 @@ window.Pages=window.Pages||{};
         +'<div class="grow"><div class="pc-name">'+U.esc(nameOf(p))+' <span class="pc-uid">'+U.esc(handleOf(p))+'</span></div></div>'
         +'<button class="pc-more" data-more="'+p.id+'">'+I.moreV(18)+'</button></div>'
         +(p.text?'<div class="pc-text">'+U.esc(p.text)+'</div>':'')
+        +(p.music?Pages.musicCardHTML(p.music,'pc-music'):'')
         +(p.imgs.length?('<div class="post-imgs">'+p.imgs.map(k=>{
             const src=imgSrc(k);
             return '<div class="pi '+(p.imgs.length===1?'solo':'')+'" data-pimg="'+p.id+':'+U.esc(k)+'">'
@@ -102,6 +103,7 @@ window.Pages=window.Pages||{};
 
     function bindPosts(box){
       UI.mountBlobs(box);
+      U.$$('[data-music-open]',box).forEach(b=>b.onclick=e=>{ e.stopPropagation(); Pages.playSharedMusic(b.dataset.musicOpen); });
       U.$$('[data-like]',box).forEach(b=>b.onclick=()=>{ Store.toggleLike(b.dataset.like); U.vibrate(6); });
       U.$$('[data-cmt]',box).forEach(b=>b.onclick=()=>{
         const pid=b.dataset.cmt;
@@ -242,6 +244,7 @@ window.Pages=window.Pages||{};
         +'<div class="grow"><div class="pc-name">'+U.esc(Store.displayName(p.author))+' <span class="pc-uid">'+U.esc(handleOf(p.author))+'</span></div>'
         +'<div class="tiny">'+U.fmtPost(p.at)+'</div></div></div>'
         +(p.text?'<div class="pd-text">'+U.esc(p.text)+'</div>':'')
+        +(p.music?Pages.musicCardHTML(p.music,'pd-music'):'')
         +(p.imgs&&p.imgs.length?'<div class="pd-imgs">'+p.imgs.map(k=>{
             const src=imgSrc(k);
             return '<div class="pd-img" data-pdimg="'+U.esc(k)+'">'
@@ -255,6 +258,7 @@ window.Pages=window.Pages||{};
         +'<div class="modal-actions"><button class="btn light block" data-a="close">关闭</button></div>',
       after(ov,api){
         UI.mountBlobs(ov);
+        U.$$('[data-music-open]',ov).forEach(b=>b.onclick=e=>{ e.stopPropagation(); api.close(); Pages.playSharedMusic(b.dataset.musicOpen); });
         U.$$('[data-pdimg]',ov).forEach(d=>d.onclick=()=>{
           const im=d.querySelector('img'); if(im&&im.src) UI.lightbox(im.src);
         });

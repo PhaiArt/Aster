@@ -69,7 +69,6 @@ Pages.chatSettings=function(el,convId){
     const box=U.$('#cs-content',el);
     if(sub==='bg') return renderBg(box);
     if(sub==='rolebg') return renderRoleBg(box);
-    if(sub==='layout') return renderLayout(box);
     if(sub==='members') return renderMembers(box);
     const csNow=Store.getCS(convId);
     let html=headHtml()+tabsHtml()+'<div class="cs-body">';
@@ -84,9 +83,6 @@ Pages.chatSettings=function(el,convId){
         +'<span class="grow"><span class="set-title">角色背景图</span><br><span class="set-sub">角色头像后方的封面背景（可导入图片）</span></span>'
         +'<span class="chev" style="color:#C9C9CF">'+I.chevronRight(17)+'</span></button>'
         +'<div class="cs-sec sec-label" style="margin-top:6px">消息显示</div>'
-        +'<button class="set-card" data-sub="layout"><span class="set-ico">'+I.user(18)+'</span>'
-        +'<span class="grow"><span class="set-title">头像与气泡布局</span><br><span class="set-sub">头像显示、大小与对齐</span></span>'
-        +'<span class="chev" style="color:#C9C9CF">'+I.chevronRight(17)+'</span></button>'
         +'<div class="set-card" style="cursor:default"><span class="set-ico">'+I.clock(17)+'</span>'
         +'<span class="grow"><span class="set-title">显示时间戳</span><br><span class="set-sub">日期分隔与气泡时间</span></span>'
         +UI.switchHtml(csNow.showTs,'data-sw="showTs"')+'</div>'

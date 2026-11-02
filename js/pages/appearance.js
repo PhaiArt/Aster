@@ -7,6 +7,24 @@ Pages.appearance=function(el){
   function isDark(){ return App.resolvedTheme()==='dark'; }
   function schemeOf(key){ return App.BUBBLE_SCHEMES[key]||App.BUBBLE_SCHEMES.mist; }
 
+  function previewAvatarHTML(){
+    const who=app.avatarWho||'both';
+    const sz=app.avatarSize==null?34:app.avatarSize;
+    const show=app.avatarShow!==false&&who!=='none';
+    const showThem=show&&who!=='me';
+    const showMe=show&&who!=='them';
+    const sample=(Store.state.contacts||[])[0];
+    const them=sample?UI.avatar(sample.id,sz):UI.avatar('me',sz);
+    const me=UI.avatar('me',sz);
+    return '<div class="ap-row them">'+(showThem?them:'')
+      +'<div class="ap-bubble">今晚一起看星星吗 ✦</div></div>'
+      +'<div class="ap-row me"><div class="ap-bubble">好呀，几点？</div>'+(showMe?me:'')+'</div>'
+      +'<div class="ap-row them">'+(showThem?them:'')
+      +'<div class="ap-bubble">九点，老地方见</div></div>'
+      +'<div class="ap-time">14:20</div>'
+      +'<div class="ap-row me"><div class="ap-bubble">收到 ✦</div>'+(showMe?me:'')+'</div>';
+  }
+
   function paintTheme(){
     U.$$('[data-theme-opt]',el).forEach(b=>{
       b.classList.toggle('active', b.dataset.themeOpt===(app.theme||'light'));
@@ -187,12 +205,17 @@ Pages.appearance=function(el){
     +'</div>'
 
     +'<div class="cs-sec sec-label">气泡预览</div>'
-    +'<div class="ap-preview" id="ap-preview">'
-    +'<div class="ap-row them"><div class="ap-bubble">今晚一起看星星吗 ✦</div></div>'
-    +'<div class="ap-row me"><div class="ap-bubble">好呀，几点？</div></div>'
-    +'<div class="ap-row them"><div class="ap-bubble">九点，老地方见</div></div>'
-    +'<div class="ap-time">14:20</div>'
-    +'<div class="ap-row me"><div class="ap-bubble">收到 ✦</div></div>'
+    +'<div class="ap-preview" id="ap-preview">'+previewAvatarHTML()+'</div>'
+
+    +'<div class="cs-sec sec-label">聊天头像</div>'
+    +'<div class="set-card ap-avatar-card">'
+    +'<div class="ap-mrow"><div><b>显示头像</b><span>聊天气泡旁是否显示头像</span></div>'+UI.switchHtml(app.avatarShow!==false,'id="ap-av-show"')+'</div>'
+    +'<div class="seg light ap-av-seg" id="ap-av-who">'
+    +[['both','双方'],['them','对方'],['me','我']].map(w=>'<button class="sg '+((app.avatarWho||'both')===w[0]?'active':'')+'" data-av-who="'+w[0]+'">'+w[1]+'</button>').join('')
+    +'</div>'
+    +'<div class="ap-mrow" style="margin-top:12px"><b>头像大小</b><em><span id="ap-av-size-val">'+(app.avatarSize==null?34:app.avatarSize)+'</span> px</em></div>'
+    +'<input class="ap-range" id="ap-av-size" type="range" min="28" max="46" step="1" value="'+(app.avatarSize==null?34:app.avatarSize)+'">'
+    +'<p class="ap-hint">头像设置会应用到所有聊天；预览框会实时同步。</p>'
     +'</div>'
 
     +'<div class="cs-sec sec-label">气泡尺寸</div>'
@@ -377,7 +400,38 @@ Pages.appearance=function(el){
     if(on) U.vibrate(8);
   });
 
+  /* 聊天头像（全局） */
+  function paintPreview(){
+    const box=U.$('#ap-preview',el);
+    if(!box) return;
+    box.innerHTML=previewAvatarHTML();
+    UI.mountBlobs(box);
+  }
+  UI.bindSwitch(el,'#ap-av-show',on=>{
+    app.avatarShow=on;
+    Store.setApp({avatarShow:on},true);
+    paintPreview();
+  });
+  U.$$('#ap-av-who [data-av-who]',el).forEach(b=>{
+    b.onclick=()=>{
+      app.avatarWho=b.dataset.avWho;
+      Store.setApp({avatarWho:app.avatarWho},true);
+      U.$$('#ap-av-who [data-av-who]',el).forEach(x=>x.classList.toggle('active',x===b));
+      paintPreview();
+    };
+  });
+  const avSize=U.$('#ap-av-size',el), avSizeOut=U.$('#ap-av-size-val',el);
+  if(avSize){
+    avSize.oninput=()=>{
+      app.avatarSize=+avSize.value;
+      if(avSizeOut) avSizeOut.textContent=avSize.value;
+      Store.setApp({avatarSize:app.avatarSize},true);
+      paintPreview();
+    };
+  }
+
   /* 初始化选中态 */
   paintTheme(); paintShapes(); paintSwatches(); paintOtherSwatches(); paintTsGap();
   U.$$('#ap-font [data-font]',el).forEach(b=>b.classList.toggle('on', (app.fontScale||'md')===b.dataset.font));
+  UI.mountBlobs(el);
 };

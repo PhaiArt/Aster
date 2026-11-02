@@ -7,11 +7,15 @@ Pages.chatDetail=function(el,convId){
   const st=Store.state;
   const contact=cv.isGroup?null:Store.contact(cv.contactId);
   const cs=Store.getCS(convId);
+  const app=Store.state.app||{};
+  const avatarShow=app.avatarShow!==false;
+  const avatarWho=app.avatarWho||'both';
+  const avatarSize=app.avatarSize==null?34:app.avatarSize;
   const title=cv.isGroup?cv.name:(contact.remark||contact.name);
   const dissolved=!!cv.dissolved;   /* 群聊已解散：仅可查看历史，禁止发送 */
 
-  /* 聊天排版：头像大小由「聊天设置」控制；气泡圆角/配色走全局外观设置 */
-  const vars='--chat-avatar:'+cs.avatarSize+'px;';
+  /* 聊天排版：头像显示由「应用外观」控制；气泡圆角/配色走全局外观设置 */
+  const vars='--chat-avatar:'+avatarSize+'px;';
 
   el.innerHTML=
     '<div class="chat-page bg-'+cs.bg+(dissolved?' dissolved':'')+'" data-conv="'+U.esc(cv.id)+'">'
@@ -64,8 +68,8 @@ Pages.chatDetail=function(el,convId){
   }
   function bubbleHtml(m,g){
     const mine=m.from==='me';
-    const showAv=cs.showAvatars&&cs.avatarWho!=='none'
-      &&!(mine&&cs.avatarWho==='them')&&!(!mine&&cs.avatarWho==='me');
+    const showAv=avatarShow&&avatarWho!=='none'
+      &&!(mine&&avatarWho==='them')&&!(!mine&&avatarWho==='me');
     let inner='';
     /* 问卷：居中独立卡片，不带头像、不带气泡 */
     if(m.type === 'survey'){
@@ -116,6 +120,10 @@ Pages.chatDetail=function(el,convId){
       inner+='<div class="transfer-card" data-tf="1"><div class="tf-kind">'+U.esc(m.kind||'转账')+'</div>'
         +'<div class="tf-amt">¥ '+(+m.amount||0).toFixed(2)+'</div>'
         +(tfNote?'<div class="tf-note">'+U.esc(tfNote)+'</div>':'')+'</div>';
+    }
+    else if(m.type==='music'){
+      if(!m.music) inner+='<div class="music-share-card"><div class="sh-foot">这首歌已不存在</div></div>';
+      else inner+=Pages.musicCardHTML(m.music);
     }
     else if(m.type==='share'){
       const sp=st.posts.find(x=>x.id===m.postId);
@@ -178,8 +186,8 @@ Pages.chatDetail=function(el,convId){
     }
     /* wrapper 内联尺寸跟随设置中的头像大小，避免内层头像溢出被气泡压住
        群聊同样按「显示谁的头像」设置渲染每行头像（他人=成员头像，自己=我的头像） */
-    const av=(showAv&&(cs.avatarWho==='both'||(mine&&cs.avatarWho==='me')||(!mine&&cs.avatarWho==='them')))
-      ?('<span class="m-av" style="width:'+cs.avatarSize+'px;height:'+cs.avatarSize+'px">'+(mine?UI.avatar('me',cs.avatarSize):UI.avatar(m.from,cs.avatarSize))+'</span>')
+    const av=(showAv&&(avatarWho==='both'||(mine&&avatarWho==='me')||(!mine&&avatarWho==='them')))
+      ?('<span class="m-av" style="width:'+avatarSize+'px;height:'+avatarSize+'px">'+(mine?UI.avatar('me',avatarSize):UI.avatar(m.from,avatarSize))+'</span>')
       :'';
     /* 群聊里对方消息的昵称只在消息组第一条上方显示一次 */
     const groupName=(!mine&&cv.isGroup&&g.first)?'<div class="tiny" style="margin:0 4px 2px">'+U.esc(Store.displayName(m.from))+'</div>':'';
@@ -190,6 +198,7 @@ Pages.chatDetail=function(el,convId){
       +(m.type==='checkin'?' ck-bubble':'')
       +(m.type==='image'&&m.stk?' stk-bubble':'')
       +(m.type==='share'?' share-bubble':'')
+      +(m.type==='music'?' music-bubble':'')
       +(m.type==='call'?' call-bubble':'')
       +(m.proactive?' has-proactive':'')
       +(m.type==='no-reply'?' bubble-muted':'');
@@ -298,6 +307,11 @@ Pages.chatDetail=function(el,convId){
     });
     /* 转账卡 */
     U.$$('[data-tf]',msgsBox).forEach(d=>d.onclick=()=>UI.toast('转账已记录'));
+    /* 分享音乐卡：回到本地音乐库播放 */
+    U.$$('[data-music-open]',msgsBox).forEach(d=>d.onclick=e=>{
+      e.stopPropagation();
+      Pages.playSharedMusic(d.dataset.musicOpen);
+    });
     /* 分享动态卡：点开完整动态 */
     U.$$('[data-share]',msgsBox).forEach(d=>d.onclick=e=>{
       e.stopPropagation();

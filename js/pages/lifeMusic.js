@@ -1,6 +1,25 @@
 /* ===== 听音乐：精装播放页 ===== */
 window.Pages=window.Pages||{};
 
+/* 聊天 / 动态里的音乐卡只带快照；点击时回到本地音乐库播放。 */
+Pages.playSharedMusic=function(trackId){
+  const t=(Store.state.app.lifeMusic||[]).find(x=>x.id===trackId);
+  if(!t){ UI.toast('这首歌已从音乐库移除'); return; }
+  try{ if(window.MusicPlayer) MusicPlayer.play(t); }catch(e){}
+  if(location.hash!=='#/life-music') location.hash='#/life-music';
+};
+
+/* 动态 / 聊天共用的音乐卡 */
+Pages.musicCardHTML=function(m,extra){
+  m=m||{};
+  const cover=m.cover?'<img src="'+U.esc(m.cover)+'" alt="">':'<span class="msc-note">'+I.music(18)+'</span>';
+  return '<div class="music-share-card '+(extra||'')+'" data-music-open="'+U.esc(m.trackId||'')+'">'
+    +'<div class="msc-cover">'+cover+'</div>'
+    +'<div class="msc-meta"><span class="msc-kicker">SHARED TRACK</span>'
+    +'<b>'+U.esc(m.title||'未命名')+'</b><span>'+U.esc(m.artist||'音乐')+'</span></div>'
+    +'<span class="msc-play">'+I.play(13)+'</span></div>';
+};
+
 Pages.lifeMusic=function(el){
   const st=Store.state;
   const tracks=(st.app.lifeMusic||[]).slice().sort((a,b)=>(b.addedAt||0)-(a.addedAt||0));
@@ -17,7 +36,8 @@ Pages.lifeMusic=function(el){
     +'</div>'
     +'<div class="music-meta">'
       +'<div><h2 id="mu-title">还没有歌曲</h2><p id="mu-artist">导入一首歌开始听</p></div>'
-      +'<button class="music-heart" id="mu-heart">'+I.heartFill(17)+'</button>'
+      +'<div class="music-actions"><button class="music-heart" id="mu-share" title="分享这首歌">'+I.share(16)+'</button>'
+      +'<button class="music-heart" id="mu-heart">'+I.heartFill(17)+'</button></div>'
     +'</div>'
     +'<div class="music-progress">'
       +'<div class="music-bar" id="mu-bar"><i id="mu-prog"></i></div>'
@@ -43,6 +63,7 @@ Pages.lifeMusic=function(el){
         +'<div class="mt-cover">'+(t.cover?'<img src="'+U.esc(t.cover)+'" alt="">':'')+'</div>'
         +'<button class="mt-play" data-play="'+t.id+'">'+I.play(13)+'</button>'
         +'<div class="mt-meta"><b>'+U.esc(t.title)+'</b><span>'+U.esc(t.artist||(t.kind==='file'?'本地文件':'网易云'))+'</span></div>'
+        +'<button class="mt-share" data-share-track="'+t.id+'" title="分享这首歌">'+I.share(15)+'</button>'
         +'<button class="mt-del" data-del-track="'+t.id+'">'+I.trash(15)+'</button>'
         +'</div>').join('')+'</div>'
       :'<div class="ld-empty">还没有导入音乐</div>')
@@ -201,6 +222,69 @@ Pages.lifeMusic=function(el){
     if(!tracks.length){ UI.toast('先导入一首歌'); return; }
     location.hash='#/life-together';
   };
+
+  function musicSnap(t){
+    return {trackId:t.id,title:t.title||'未命名',artist:t.artist||'',cover:t.cover||null,kind:t.kind||''};
+  }
+  function convName(cv){ return cv.isGroup?cv.name:Store.displayName(cv.contactId); }
+  function convAvatar(cv){
+    if(cv.isGroup) return '<span class="conv-ico">'+I.users(18)+'</span>';
+    return UI.avatar(cv.contactId,38);
+  }
+  function shareToPost(t){
+    UI.openModal({
+      title:'分享到动态',
+      html:'<div class="music-share-preview">'+Pages.musicCardHTML(musicSnap(t))+'</div>'
+        +'<textarea class="field" id="ms-post-text" maxlength="140" placeholder="说点什么…（可选）" style="min-height:76px;margin-top:10px"></textarea>'
+        +'<div class="modal-actions"><button class="btn light" data-a="c">取消</button><button class="btn dark" data-a="ok">发布</button></div>',
+      after(ov,api){
+        ov.querySelector('[data-a=c]').onclick=()=>api.close();
+        ov.querySelector('[data-a=ok]').onclick=()=>{
+          const text=U.$('#ms-post-text',ov).value.trim();
+          Store.addPost({text,music:musicSnap(t)});
+          api.close(); UI.toast('已分享到动态');
+        };
+      }
+    });
+  }
+  function shareToChat(t){
+    const convs=Store.state.convs.filter(v=>!v.dissolved).sort((a,b)=>(b.lastAt||0)-(a.lastAt||0));
+    if(!convs.length){ UI.toast('还没有聊天窗口'); return; }
+    UI.openModal({
+      sheet:true,
+      title:'分享到聊天',
+      html:'<div class="pick-list">'+convs.map(cv=>
+        '<button class="pick-row" data-music-cv="'+cv.id+'">'+convAvatar(cv)
+        +'<span class="grow">'+U.esc(convName(cv))+'</span>'
+        +'<span class="tiny">'+(cv.isGroup?'群聊':'单聊')+'</span></button>').join('')+'</div>'
+        +'<p class="tiny" style="padding:10px 4px 0">分享后，歌曲会以卡片形式出现在聊天里</p>',
+      after(ov,api){
+        U.$$('[data-music-cv]',ov).forEach(b=>b.onclick=()=>{
+          const cv=convs.find(x=>x.id===b.dataset.musicCv);
+          if(!cv) return;
+          Store.send(cv.id,{type:'music',music:musicSnap(t)});
+          api.close(); UI.toast('已分享到「'+convName(cv)+'」');
+        });
+      }
+    });
+  }
+  function openMusicShareMenu(t,anchor){
+    UI.menuAt([
+      {icon:'music',label:'分享到动态',onClick:()=>shareToPost(t)},
+      {icon:'share',label:'分享到聊天',onClick:()=>shareToChat(t)}
+    ],anchor);
+  }
+  const muShare=U.$('#mu-share',el);
+  if(muShare) muShare.onclick=()=>{
+    const t=MusicPlayer.getState().track||tracks[0];
+    if(!t){ UI.toast('先导入一首歌'); return; }
+    openMusicShareMenu(t,muShare);
+  };
+  U.$$('[data-share-track]',el).forEach(b=>b.onclick=e=>{
+    e.stopPropagation();
+    const t=tracks.find(x=>x.id===b.dataset.shareTrack);
+    if(t) openMusicShareMenu(t,b);
+  });
 
   U.$$('[data-del-track]',el).forEach(b=>b.onclick=async e=>{
     e.stopPropagation();
